@@ -1,0 +1,16 @@
+name: memoire
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  verifier:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Vérifier la cohérence de la mémoire
+        shell: powershell
+        run: .\scripts\routeur.ps1 -Verifier

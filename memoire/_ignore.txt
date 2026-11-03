@@ -1,0 +1,12 @@
+# Fichiers suivis par Git qui n'ont pas besoin d'être couverts par memoire/ (un motif par ligne, syntaxe -like de PowerShell).
+# Tout autre fichier suivi doit être cité dans un 'couvre' (un chemin finissant par / couvre un dossier).
+README.md
+LICENSE*
+AGENTS.md
+memoire/*
+scripts/routeur.ps1
+scripts/installer.ps1
+scripts/mettre-a-jour-projets.ps1
+.github/*
+.opencode/*
+.harness-base

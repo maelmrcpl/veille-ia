@@ -1,0 +1,4 @@
+# Projet lie a harness-base. Gere par scripts/installer.ps1 : ne pas modifier a la main.
+source: https://github.com/maelmrcpl/harness-base.git
+version: 65dd717
+date: 2026-11-03
