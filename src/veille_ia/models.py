@@ -9,3 +9,9 @@ class Article:
     published: int
     score: int = 0
     text: str = ""
+
+
+@dataclass
+class Topic:
+    title: str
+    articles: list[Article]

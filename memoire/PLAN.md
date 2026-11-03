@@ -29,7 +29,7 @@ Un agent Python qui chaque jour vers 8h collecte les actualités IA, les regroup
 | 2. Client LLM | `feat/llm-client` | Fait, fusionnée |
 | 3. Collecte HN avec lecture complète | `feat/hn-collector` | Fait, fusionnée |
 | 4. Collecte blogs et Reddit (arXiv abandonné) | `feat/other-collectors` | Fait (4a blogs, 4b Reddit, 4c `scripts/try_all.py`), à fusionner |
-| 5. Déduplication et regroupement | `feat/dedup-clustering` | À faire |
+| 5. Déduplication et regroupement | `feat/dedup-clustering` | 5a, 5b et 5c faits (essai réel fait, regroupement à affiner, voir `memoire/traitement.md`) |
 | 6. Sélection et résumé | `feat/daily-summary` | À faire |
 | 7. Planification Windows 8h | `feat/scheduling` | À faire |
 | 8. Mémoire finale | `docs/memory` | `/onboard create` fait (4 fichiers) ; reste `/onboard update` et suppression de `PLAN.md` à la fin |

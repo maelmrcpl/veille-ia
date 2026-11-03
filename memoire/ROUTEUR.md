@@ -14,6 +14,7 @@ Lis un fichier quand la tâche correspond à sa colonne « Quand le lire ». Plu
 | `memoire/llm.md` | Tu modifies ou appelles le client LLM ; tu changes les modèles, leurs quotas ou les variables d'environnement LLM |
 | `memoire/PLAN.md` | Tu reprends le développement de l'agent de veille IA dans une nouvelle session, ou tu commences ou termines une phase du plan |
 | `memoire/principes.md` | Tu écris ou modifies du code ; tu dois lancer les tests, le lint ou le build ; tu hésites sur un choix de conception ou de nommage |
+| `memoire/traitement.md` | Tu modifies le dédoublonnage des articles déjà vus, le regroupement LLM des articles en sujets ou le type Topic |
 
 Aucune ligne ne correspond : lis `memoire/architecture.md`, avertis l'utilisateur que la tâche n'est pas couverte par le routeur et n'invente rien.
 
