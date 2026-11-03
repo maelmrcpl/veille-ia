@@ -10,6 +10,9 @@ Lis un fichier quand la tâche correspond à sa colonne « Quand le lire ». Plu
 | Fichier | Quand le lire |
 |---|---|
 | `memoire/architecture.md` | Tu découvres le projet ; tu modifies sa structure ou sa configuration (opencode.json, .gitignore, CI) ; tu ajoutes ou modifies un skill, un agent ou une commande ; tu ajoutes un fichier de mémoire |
+| `memoire/collecte.md` | Tu ajoutes ou modifies un collecteur de news, le type Article, la recherche Hacker News ou la lecture complète des pages |
+| `memoire/llm.md` | Tu modifies ou appelles le client LLM ; tu changes les modèles, leurs quotas ou les variables d'environnement LLM |
+| `memoire/PLAN.md` | Tu reprends le développement de l'agent de veille IA dans une nouvelle session, ou tu commences ou termines une phase du plan |
 | `memoire/principes.md` | Tu écris ou modifies du code ; tu dois lancer les tests, le lint ou le build ; tu hésites sur un choix de conception ou de nommage |
 
 Aucune ligne ne correspond : lis `memoire/architecture.md`, avertis l'utilisateur que la tâche n'est pas couverte par le routeur et n'invente rien.
