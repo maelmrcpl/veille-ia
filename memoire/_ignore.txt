@@ -10,3 +10,9 @@ scripts/mettre-a-jour-projets.ps1
 .github/*
 .opencode/*
 .harness-base
+# Temporaire : à retirer à la phase 8 (/onboard create)
+src/*
+tests/*
+pytest.ini
+requirements.txt
+.env.example
