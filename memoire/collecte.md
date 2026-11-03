@@ -1,6 +1,6 @@
 ---
 quand_lire: Tu ajoutes ou modifies un collecteur de news, le type Article, la recherche Hacker News ou la lecture complète des pages
-couvre: src/veille_ia/models.py, src/veille_ia/fulltext.py, src/veille_ia/collectors/, tests/test_hn.py, tests/test_fulltext.py, tests/test_blogs.py, scripts/try_hn.py
+couvre: src/veille_ia/models.py, src/veille_ia/fulltext.py, src/veille_ia/collectors/, tests/test_hn.py, tests/test_fulltext.py, tests/test_blogs.py, tests/test_reddit.py, scripts/try_hn.py
 verifie: 2026-11-03
 ---
 # Collecte des articles
@@ -22,6 +22,10 @@ verifie: 2026-11-03
 ## Blogs d'éditeurs (`src/veille_ia/collectors/blogs.py`)
 - `collect(now=None)` parcourt `FEEDS` : OpenAI, Hugging Face, Google AI (flux IA global de blog.google, pas seulement DeepMind) et Anthropic (relais communautaire `Olshansk/rss-feeds`, Anthropic n'a pas de flux natif ; le relais peut prendre du retard).
 - arXiv est abandonné (décision utilisateur) : environ 2 000 articles par jour sans score, trop pour le regroupement LLM.
+
+## Reddit (`src/veille_ia/collectors/reddit.py`)
+- `collect(now=None)` lit le flux Atom `.rss` de r/MachineLearning et r/LocalLLaMA via `collect_feed`. Pas de score (`score` = 0).
+- Essai réel du 2026-11-03 : r/MachineLearning répond (14 articles sur 24 h, surtout des discussions `[D]` peu liées à l'actualité) ; r/LocalLLaMA répond 429 (403 sur `old.reddit.com`) et est donc sauté. À retester plus tard.
 
 ## Lecture complète (`src/veille_ia/fulltext.py`)
 - `fetch_text(url)` télécharge la page (User-Agent `Mozilla/5.0 (veille-ia)`, délai 20 s), extrait le texte avec `trafilatura` et le tronque à `MAX_CHARS` = 8000.
