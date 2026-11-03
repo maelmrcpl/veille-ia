@@ -17,3 +17,4 @@ pytest.ini
 requirements.txt
 .env.example
 scripts/try_llm.py
+scripts/try_hn.py
