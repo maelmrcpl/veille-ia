@@ -2,6 +2,7 @@ import time
 
 import requests
 
+from veille_ia.fulltext import fetch_text
 from veille_ia.models import Article
 
 SEARCH_URL = "https://hn.algolia.com/api/v1/search_by_date"
@@ -52,3 +53,11 @@ def collect(now=None):
                 score=hit.get("points") or 0,
             )
     return sorted(articles.values(), key=lambda a: a.score, reverse=True)
+
+
+def enrich(articles):
+    for article in articles:
+        if "news.ycombinator.com/item" in article.url:
+            continue
+        article.text = fetch_text(article.url)
+    return articles

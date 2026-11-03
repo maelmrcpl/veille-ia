@@ -1,4 +1,5 @@
 from veille_ia.collectors import hn
+from veille_ia.models import Article
 
 
 class FakeResponse:
@@ -67,3 +68,12 @@ def test_collect_falls_back_to_hn_item_url(monkeypatch):
     )
     articles = hn.collect(now=2000)
     assert articles[0].url == "https://news.ycombinator.com/item?id=42"
+
+
+def test_enrich_fills_text_and_skips_hn_items(monkeypatch):
+    monkeypatch.setattr(hn, "fetch_text", lambda url: f"text of {url}")
+    external = Article("A", "http://a", "Hacker News", 1)
+    internal = Article("B", "https://news.ycombinator.com/item?id=1", "Hacker News", 1)
+    hn.enrich([external, internal])
+    assert external.text == "text of http://a"
+    assert internal.text == ""
