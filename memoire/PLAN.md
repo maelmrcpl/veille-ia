@@ -28,7 +28,7 @@ Un agent Python qui chaque jour vers 8h collecte les actualités IA, les regroup
 | 1. Squelette Python | `chore/project-skeleton` | Fait, fusionnée |
 | 2. Client LLM | `feat/llm-client` | Fait, fusionnée |
 | 3. Collecte HN avec lecture complète | `feat/hn-collector` | Fait, fusionnée |
-| 4. Collecte arXiv, blogs, Reddit | `feat/other-collectors` | À faire |
+| 4. Collecte blogs et Reddit (arXiv abandonné) | `feat/other-collectors` | Fait (4a blogs, 4b Reddit, 4c `scripts/try_all.py`), à fusionner |
 | 5. Déduplication et regroupement | `feat/dedup-clustering` | À faire |
 | 6. Sélection et résumé | `feat/daily-summary` | À faire |
 | 7. Planification Windows 8h | `feat/scheduling` | À faire |
@@ -39,8 +39,9 @@ Un agent Python qui chaque jour vers 8h collecte les actualités IA, les regroup
 - `src/veille_ia/llm.py` : `complete(prompt, models, system=None)` avec `models` = liste de `(nom, rpm)` (voir `parse_models`). Endpoint chat completions compatible OpenAI (Google AI Studio). Limiteur par modèle (60 / rpm secondes), repli sur erreur 429 vers le modèle suivant, modèle épuisé non retenté pendant l'exécution, `LLMError` si tous épuisés. Lit `LLM_API_URL` et `LLM_API_KEY` (chargés par `python-dotenv`).
 - `src/veille_ia/fulltext.py` : `fetch_text(url)` (requests + trafilatura, 8 000 caractères max, texte vide en cas d'erreur).
 - `src/veille_ia/collectors/hn.py` : `collect()` (API Algolia, 8 mots-clés, 24 h, 20 points minimum, dédoublonné, trié par score) et `enrich(articles)` (remplit `text`, saute les liens `news.ycombinator.com/item`).
+- `src/veille_ia/collectors/rss.py` : `collect_feed(url, source, now)` (requests + feedparser, 24 h, texte = résumé nettoyé, flux en erreur sauté). `blogs.py` (OpenAI, Hugging Face, Google AI, Anthropic via relais `Olshansk/rss-feeds`) et `reddit.py` (r/MachineLearning ; r/LocalLLaMA répond 429, sauté) : `collect(now=None)`. arXiv abandonné (environ 2 000 articles par jour sans score). `scripts/try_all.py` lance les trois collecteurs. 23 tests passent.
 - Scripts d'essai : `scripts/try_llm.py` (un appel), `scripts/try_hn.py` (affiche les articles du jour). Ils font `sys.path.insert(0, "src")`.
-- Tests : `tests/` avec de faux appels HTTP, aucun réseau ; `pytest.ini` règle `pythonpath = src`. 18 tests passaient à la fin de la phase 3.
+- Tests : `tests/` avec de faux appels HTTP, aucun réseau ; `pytest.ini` règle `pythonpath = src`. 23 tests passent à la fin de la phase 4.
 - `.env.example` : `LLM_API_URL`, `LLM_API_KEY` (vide), `LLM_MODELS_CLUSTER`, `LLM_MODELS_SUMMARY` au format `modèle:rpm`.
 
 ## Contraintes LLM (Google AI Studio, offre gratuite, clé API dans `.env`)
