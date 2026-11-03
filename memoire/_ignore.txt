@@ -16,3 +16,4 @@ tests/*
 pytest.ini
 requirements.txt
 .env.example
+scripts/try_llm.py
