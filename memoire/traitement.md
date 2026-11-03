@@ -1,6 +1,6 @@
 ---
 quand_lire: Tu modifies le dédoublonnage des articles déjà vus, le regroupement LLM des articles en sujets ou le type Topic
-couvre: src/veille_ia/dedup.py, src/veille_ia/cluster.py, tests/test_dedup.py, tests/test_cluster.py
+couvre: src/veille_ia/dedup.py, src/veille_ia/cluster.py, tests/test_dedup.py, tests/test_cluster.py, scripts/try_cluster.py
 verifie: 2026-11-03
 ---
 # Dédoublonnage et regroupement
@@ -16,4 +16,5 @@ verifie: 2026-11-03
 - `cluster(articles, models)` fait un seul appel `llm.complete` (`models` = liste `(nom, rpm)`, prévue pour `LLM_MODELS_CLUSTER`). Le prompt numérote les articles (`[i] titre (source) 300 premiers caractères du texte`) et demande `{"topics": [{"title", "ids"}], "off_topic": [ids]}`.
 - Les articles de `off_topic` (hors IA) sont écartés. Un article absent de la réponse devient un sujet seul. Les numéros inconnus, non entiers ou répétés sont ignorés. Un bloc ```` ```json ```` autour de la réponse est toléré.
 - Réponse non JSON ou sans clé `topics` : `LLMError`. Liste vide : aucun appel LLM.
-- Pas encore testé avec le vrai LLM (tests avec faux `llm.complete`).
+- Essai réel (`scripts/try_cluster.py`, 2026-11-03, 53 articles, 1 appel) : le premier prompt (« même sujet précis ») donnait des groupes fourre-tout ; le prompt actuel (« même événement précis ») donne 31 sujets et écarte 13 articles, tous du bruit hors IA (Ubuntu 0day, Intel, Show HN divers). Défauts restants : l'article « Scaling Git at OpenAI » de Hacker News et celui du blog OpenAI ne sont pas regroupés ; « Open models can do 90 percent… » est rangé à tort avec l'IPO d'Anthropic ; les titres de sujets sortent parfois en anglais malgré la consigne ; les discussions `[D]` de Reddit sont gardées.
+- Le script `scripts/try_cluster.py` consomme 1 appel LLM et affiche sujets et articles écartés.

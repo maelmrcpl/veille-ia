@@ -11,8 +11,9 @@ SYSTEM = (
     "Tu réponds uniquement par un objet JSON, sans texte autour."
 )
 
-PROMPT = """Voici des articles numérotés. Regroupe ceux qui parlent du même événement ou du même sujet précis.
-Écarte (off_topic) ceux qui ne concernent pas l'intelligence artificielle.
+PROMPT = """Voici des articles numérotés. Regroupe uniquement ceux qui parlent du même événement précis (même annonce, même publication, même affaire).
+Ne crée pas de groupe thématique large : un article sans équivalent reste seul dans son propre sujet.
+Écarte (off_topic) ceux qui ne concernent pas l'intelligence artificielle, ainsi que les questions personnelles ou discussions sans information.
 
 Réponds avec ce JSON :
 {{"topics": [{{"title": "titre court en français", "ids": [0, 3]}}], "off_topic": [5]}}
