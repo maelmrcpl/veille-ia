@@ -13,7 +13,7 @@ SYSTEM = (
 
 PROMPT = """Voici des articles numérotés. Regroupe ceux qui traitent de la même affaire d'actualité : même annonce, même publication, même dossier, même si chaque article en donne un angle différent (chiffres, réactions, critiques). Exemple : tous les articles sur le dépôt du dossier d'introduction en bourse d'une même entreprise forment un seul groupe.
 Ne regroupe pas des affaires différentes sous un thème large (« recherche en IA », « entreprises et IA ») : un article sans équivalent reste seul dans son propre sujet. En général la plupart des articles restent seuls et quelques groupes comptent 2 à 8 articles.
-Écarte (off_topic) ceux qui ne relèvent pas du domaine « {label} », ainsi que les questions personnelles ou discussions sans information.
+Écarte (off_topic) uniquement ceux qui ne relèvent clairement pas du domaine « {label} », ainsi que les questions personnelles ou discussions sans information. Un article du domaine sans équivalent n'est pas hors sujet : ne le mets pas dans off_topic, mets-le seul dans son propre sujet.
 
 Réponds avec ce JSON :
 {{"topics": [{{"title": "titre court en français", "ids": [0, 3]}}], "off_topic": [5]}}
