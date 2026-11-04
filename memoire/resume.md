@@ -1,6 +1,6 @@
 ---
-quand_lire: Tu modifies la sélection des sujets, le résumé en français, le JSON du jour ou le point d'entrée de l'agent
-couvre: src/veille_ia/summary.py, src/veille_ia/main.py, scripts/run_agent.py, tests/test_summary.py, tests/test_main.py
+quand_lire: Tu modifies la sélection des sujets, le résumé en français, le JSON du jour, le point d'entrée de l'agent ou sa planification quotidienne Windows
+couvre: src/veille_ia/summary.py, src/veille_ia/main.py, scripts/run_agent.py, scripts/run_daily.ps1, scripts/register_task.ps1, tests/test_summary.py, tests/test_main.py
 verifie: 2026-11-04
 ---
 # Résumé et point d'entrée
@@ -19,6 +19,11 @@ verifie: 2026-11-04
 - Format du JSON : `{"date", "category": "ia", "topics": [{"rank", "title", "text", "sources": [{"name", "title", "url"}]}]}`.
 - `main()` charge `.env`, lance `run()` et affiche le nombre de sujets et de mots. Lancement : `python scripts\run_agent.py` (appelle `main()` après `sys.path.insert(0, "src")`).
 - Variable absente : `LLMError("Missing environment variable …")`.
+
+## Planification Windows
+- `scripts\run_daily.ps1` : se place à la racine du projet, force `PYTHONUTF8=1`, lance `python scripts\run_agent.py` et ajoute la sortie (début, fin, code de sortie) à `data\logs\AAAA-MM-JJ.log` (`data/` est ignoré par Git). Lançable à la main.
+- `scripts\register_task.ps1 [-Heure 08:00]` : crée ou remplace la tâche `VeilleIA` (quotidienne, `powershell.exe -File run_daily.ps1`) avec `StartWhenAvailable` (rattrapage si la machine était éteinte), lancement sur batterie autorisé et réseau requis. Supprimer la tâche : `Unregister-ScheduledTask -TaskName VeilleIA -Confirm:$false`.
+- Le reset du quota Google (environ 9h à Paris, non vérifié) peut faire consommer le quota de la veille à 8h.
 
 ## Essais réels
 - 2026-11-03, ancien déroulé (un seul appel qui choisissait et écrivait) : 2 sujets et 320 mots, puis 6 sujets et 849 mots après durcissement du prompt.

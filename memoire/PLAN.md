@@ -31,7 +31,7 @@ Un agent Python qui chaque jour vers 8h collecte les actualités IA, les regroup
 | 4. Collecte blogs et Reddit (arXiv abandonné) | `feat/other-collectors` | Fait (4a blogs, 4b Reddit, 4c `scripts/try_all.py`), à fusionner |
 | 5. Déduplication et regroupement | `feat/dedup-clustering` | 5a, 5b et 5c faits (essai réel fait, regroupement à affiner, voir `memoire/traitement.md`) |
 | 6. Sélection et résumé | `feat/daily-summary` | Code et tests faits (49 tests, `memoire/resume.md`) ; essai réel Flash : 6 sujets, 849 mots (regroupement instable, voir `memoire/resume.md`) |
-| 7. Planification Windows 8h | `feat/scheduling` | À faire |
+| 7. Planification Windows 8h | `feat/scheduling` | Scripts écrits (`run_daily.ps1`, `register_task.ps1`) ; reste l'essai réel et l'enregistrement de la tâche par l'utilisateur |
 | 8. Mémoire finale | `docs/memory` | `/onboard create` fait (4 fichiers) ; reste `/onboard update` et suppression de `PLAN.md` à la fin |
 
 ## Code existant (vérifié en session)

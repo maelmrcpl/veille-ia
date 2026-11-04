@@ -12,7 +12,9 @@ Ces commandes servent de critère de succès (voir AGENTS.md §4) : lance-les av
 | Tests | `python -m pytest` (`pytest.ini` : `pythonpath = src`, `testpaths = tests`) |
 | Installer les dépendances | `pip install -r requirements.txt` (`pytest`, `requests`, `python-dotenv`, `trafilatura`) |
 | Lint / format | `à compléter` (aucun outil configuré) |
-| Build / lancement | `à compléter` (pas de point d'entrée unique) |
+| Lancement de l'agent (quota LLM consommé) | `python scripts\run_agent.py`, ou `.\scripts\run_daily.ps1` (avec log dans `data\logs`) |
+| Planifier l'agent chaque jour à 8h | `.\scripts\register_task.ps1` (voir `memoire/resume.md`) |
+| Build | `à compléter` (aucun build) |
 | Essai réel du client LLM (un appel, quota consommé) | `python scripts\try_llm.py` |
 | Essai réel de la collecte HN | `python scripts\try_hn.py` |
 | Régénérer le routeur de mémoire | `.\scripts\routeur.ps1` |
