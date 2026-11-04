@@ -1,7 +1,7 @@
----
+﻿---
 quand_lire: Tu ajoutes ou modifies un collecteur de news, le type Article, la recherche Hacker News ou la lecture complète des pages
 couvre: src/veille_ia/models.py, src/veille_ia/fulltext.py, src/veille_ia/collectors/, tests/test_hn.py, tests/test_fulltext.py, tests/test_blogs.py, tests/test_reddit.py, scripts/try_hn.py, scripts/try_all.py
-verifie: 2026-11-03
+verifie: 2026-11-04
 ---
 # Collecte des articles
 

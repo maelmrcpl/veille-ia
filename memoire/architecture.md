@@ -1,22 +1,22 @@
----
+﻿---
 quand_lire: Tu découvres le projet ; tu modifies sa structure ou sa configuration (opencode.json, .gitignore, CI) ; tu ajoutes ou modifies un skill, un agent ou une commande ; tu ajoutes un fichier de mémoire
 couvre: opencode.json, .gitignore, .github/workflows/memoire.yml, .opencode/, README.md, src/veille_ia/__init__.py
-verifie: 2026-11-03
+verifie: 2026-11-04
 ---
 # Architecture
 
 ## Projet
 - Objectif final (déclaré par l'utilisateur) : une web GUI regroupant les news du jour sur plusieurs sujets (cyber, réseau, IA…), puis un audio qui les lit par catégorie.
-- Étape actuelle : un agent Python de veille IA, prévu pour tourner chaque jour vers 8h (Planificateur de tâches Windows, pas encore en place). Le plan de développement est dans `memoire/PLAN.md`.
-- Code présent : collecte (Hacker News, blogs, Reddit), client LLM, dédoublonnage, regroupement, résumé, JSON du jour et point d'entrée `src/veille_ia/main.py`. Absente : planification (voir `memoire/PLAN.md`).
+- Étape actuelle : un agent Python de veille IA, tourne chaque jour vers 8h via la tâche planifiée `VeilleIA` (voir `memoire/resume.md`).
+- Code présent : collecte (Hacker News, blogs, Reddit), client LLM, dédoublonnage, regroupement, résumé, JSON du jour, point d'entrée `src/veille_ia/main.py` et planification Windows.
 
 ## Structure du dépôt
 | Dossier ou fichier | Rôle |
 |---|---|
 | `src/veille_ia/` | Package Python de l'agent. Détails dans `memoire/collecte.md` et `memoire/llm.md`. |
 | `tests/` | Tests `pytest`, sans appel réseau. |
-| `scripts/` | `routeur.ps1` (mémoire), `try_llm.py` et `try_hn.py` (essais réels lancés à la main). |
-| `memoire/` | Mémoire du projet et `PLAN.md` (plan de reprise de session, temporaire). |
+| `scripts/` | `routeur.ps1` (mémoire), `run_agent.py` (lancement de l'agent), `run_daily.ps1` et `register_task.ps1` (planification), `try_llm.py`, `try_hn.py`, `try_all.py` et `try_cluster.py` (essais réels lancés à la main). |
+| `memoire/` | Mémoire du projet. |
 | `README.md` | Installation et lancement des tests. |
 
 ## Fichiers de harness

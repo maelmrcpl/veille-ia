@@ -31,7 +31,7 @@ Ces commandes servent de critère de succès (voir AGENTS.md §4) : lance-les av
 - Python, fonctions simples, pas d'abstraction inutile ; constantes de réglage en tête de module (`MIN_POINTS`, `MAX_CHARS`…).
 - Fichiers en UTF-8, chemins Windows avec `\` (sauf fichiers de configuration multi-plateformes).
 - Un script durable s'écrit dans `scripts/`. Les scripts d'essai insèrent `src` dans `sys.path`.
-- Une branche par phase de développement, merge par PR (voir `memoire/PLAN.md`).
+- Une branche par phase de développement, merge par PR.
 
 ## Interdits
 - Sous PowerShell 5.1 en mode restreint : pas de méthode statique .NET (`[IO.File]::…`), pas de `New-Object`, pas de `Add-Type`.

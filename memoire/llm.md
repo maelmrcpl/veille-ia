@@ -1,7 +1,7 @@
----
+﻿---
 quand_lire: Tu modifies ou appelles le client LLM ; tu changes les modèles, leurs quotas ou les variables d'environnement LLM
 couvre: src/veille_ia/llm.py, tests/test_llm.py, scripts/try_llm.py, .env.example
-verifie: 2026-11-03
+verifie: 2026-11-04
 ---
 # Client LLM
 
@@ -18,8 +18,8 @@ verifie: 2026-11-03
 |---|---|
 | `LLM_API_URL` | Endpoint chat completions, par défaut celui de Google AI Studio compatible OpenAI. |
 | `LLM_API_KEY` | Clé API (secret, jamais dans `.env.example`). |
-| `LLM_MODELS_CLUSTER` | Modèles pour le regroupement (phase 5, non implémentée), `nom:rpm` séparés par des virgules. |
-| `LLM_MODELS_SUMMARY` | Modèles pour le résumé final (phase 6, non implémentée). |
+| `LLM_MODELS_CLUSTER` | Modèles pour le regroupement et le choix des sujets, `nom:rpm` séparés par des virgules. |
+| `LLM_MODELS_SUMMARY` | Modèles pour la rédaction du résumé final. |
 
 `scripts/try_llm.py` envoie un appel au premier modèle de `LLM_MODELS_CLUSTER`.
 
