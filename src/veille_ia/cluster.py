@@ -7,13 +7,13 @@ from veille_ia.models import Topic
 SNIPPET_CHARS = 300
 
 SYSTEM = (
-    "Tu es un assistant de veille sur l'intelligence artificielle. "
+    "Tu es un assistant de veille sur le domaine « {label} ». "
     "Tu réponds uniquement par un objet JSON, sans texte autour."
 )
 
 PROMPT = """Voici des articles numérotés. Regroupe ceux qui traitent de la même affaire d'actualité : même annonce, même publication, même dossier, même si chaque article en donne un angle différent (chiffres, réactions, critiques). Exemple : tous les articles sur le dépôt du dossier d'introduction en bourse d'une même entreprise forment un seul groupe.
 Ne regroupe pas des affaires différentes sous un thème large (« recherche en IA », « entreprises et IA ») : un article sans équivalent reste seul dans son propre sujet. En général la plupart des articles restent seuls et quelques groupes comptent 2 à 8 articles.
-Écarte (off_topic) ceux qui ne concernent pas l'intelligence artificielle, ainsi que les questions personnelles ou discussions sans information.
+Les articles viennent de sources de veille sur le domaine « {label} » : par défaut, un article est dans le domaine et doit figurer dans un sujet, seul ou regroupé. Ne mets dans off_topic que les articles manifestement sans rapport avec le domaine (sport, politique, jeux, vie personnelle, offres d'emploi, questions de carrière).
 
 Réponds avec ce JSON :
 {{"topics": [{{"title": "titre court en français", "ids": [0, 3]}}], "off_topic": [5]}}
@@ -24,12 +24,12 @@ Articles :
 {articles}"""
 
 
-def build_prompt(articles):
+def build_prompt(articles, category):
     lines = []
     for index, article in enumerate(articles):
         snippet = article.text[:SNIPPET_CHARS].replace("\n", " ")
         lines.append(f"[{index}] {article.title} ({article.source}) {snippet}".strip())
-    return PROMPT.format(articles="\n".join(lines))
+    return PROMPT.format(label=category.label, articles="\n".join(lines))
 
 
 def parse_response(content):
@@ -41,13 +41,22 @@ def parse_response(content):
         raise llm.LLMError(f"Invalid clustering response: {error}") from error
 
 
-def cluster(articles, models):
+def cluster(articles, models, category):
     if not articles:
         return []
     topics_data, off_topic = parse_response(
-        llm.complete(build_prompt(articles), models, system=SYSTEM)
+        llm.complete(
+            build_prompt(articles, category),
+            models,
+            system=SYSTEM.format(label=category.label),
+        )
     )
-    used = {i for i in off_topic if isinstance(i, int)}
+    trusted = set(category.blog_feeds)
+    used = {
+        i
+        for i in off_topic
+        if isinstance(i, int) and 0 <= i < len(articles) and articles[i].source not in trusted
+    }
     topics = []
     for item in topics_data:
         ids = []

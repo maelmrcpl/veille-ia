@@ -2,9 +2,16 @@ import sys
 
 sys.path.insert(0, "src")
 
+from veille_ia.categories import CATEGORIES
 from veille_ia.collectors import blogs, hn, reddit
 
-for name, collect in [("Hacker News", hn.collect), ("Blogs", blogs.collect), ("Reddit", reddit.collect)]:
+category = CATEGORIES["ia"]
+sources = [
+    ("Hacker News", lambda: hn.collect(category.hn_keywords)),
+    ("Blogs", lambda: blogs.collect(category.blog_feeds)),
+    ("Reddit", lambda: reddit.collect(category.reddit_feeds)),
+]
+for name, collect in sources:
     articles = collect()
     print(f"{name}: {len(articles)} articles")
     for a in articles:

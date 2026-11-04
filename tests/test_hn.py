@@ -38,23 +38,21 @@ def test_search_sends_24h_and_points_filter(monkeypatch):
 
 
 def test_collect_deduplicates_across_keywords(monkeypatch):
-    monkeypatch.setattr(hn, "KEYWORDS", ["AI", "LLM"])
     monkeypatch.setattr(
         hn.requests, "get", lambda *a, **k: FakeResponse([hit("1"), hit("2", points=90)])
     )
-    articles = hn.collect(now=2000)
+    articles = hn.collect(["AI", "LLM"], now=2000)
     assert [a.title for a in articles] == ["Title", "Title"]
     assert len(articles) == 2
 
 
 def test_collect_sorts_by_score_and_maps_fields(monkeypatch):
-    monkeypatch.setattr(hn, "KEYWORDS", ["AI"])
     monkeypatch.setattr(
         hn.requests,
         "get",
         lambda *a, **k: FakeResponse([hit("1", points=30), hit("2", points=90)]),
     )
-    articles = hn.collect(now=2000)
+    articles = hn.collect(["AI"], now=2000)
     assert [a.score for a in articles] == [90, 30]
     assert articles[0].source == "Hacker News"
     assert articles[0].url == "http://a"
@@ -62,11 +60,10 @@ def test_collect_sorts_by_score_and_maps_fields(monkeypatch):
 
 
 def test_collect_falls_back_to_hn_item_url(monkeypatch):
-    monkeypatch.setattr(hn, "KEYWORDS", ["AI"])
     monkeypatch.setattr(
         hn.requests, "get", lambda *a, **k: FakeResponse([hit("42", url=None)])
     )
-    articles = hn.collect(now=2000)
+    articles = hn.collect(["AI"], now=2000)
     assert articles[0].url == "https://news.ycombinator.com/item?id=42"
 
 

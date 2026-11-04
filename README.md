@@ -1,6 +1,13 @@
 # veille-ia
 
-Agent de veille IA : chaque jour, il collecte les actualités IA (Hacker News, blogs d'éditeurs, Reddit), les regroupe par sujet et écrit un résumé en français (6 sujets, environ 1 000 mots, rédigés pour l'oral) dans `data/ia/AAAA-MM-JJ.json`.
+Agent de veille : chaque jour, il collecte les actualités de 4 catégories sur Hacker News, des sites spécialisés et Reddit, les regroupe par sujet et écrit un résumé en français rédigé pour l'oral dans `data/<catégorie>/AAAA-MM-JJ.json`.
+
+| Catégorie | Identifiant | Sujets par jour |
+|---|---|---|
+| Intelligence artificielle | `ia` | 5 |
+| Cybersécurité | `cyber` | 4 |
+| Cloud, DevOps, infrastructure | `cloud` | 2 |
+| Réseaux et télécoms | `reseau` | 2 |
 
 ## Installation
 ```powershell
@@ -14,7 +21,8 @@ Renseigner `LLM_API_KEY` dans `.env` (endpoint et modèles Google AI Studio par 
 ## Utilisation
 | Action | Commande |
 |---|---|
-| Lancer l'agent une fois | `python scripts\run_agent.py` |
+| Lancer l'agent une fois (toutes les catégories) | `python scripts\run_agent.py` |
+| Lancer une ou plusieurs catégories | `python scripts\run_agent.py cyber reseau` |
 | Lancer avec un log dans `data\logs\` | `.\scripts\run_daily.ps1` |
 | Planifier chaque jour à 8h (Windows) | `.\scripts\register_task.ps1` (`-Heure "09:15"` pour changer) |
 | Tests | `python -m pytest` |

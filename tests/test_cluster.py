@@ -1,9 +1,11 @@
 import pytest
 
 from veille_ia import cluster, llm
+from veille_ia.categories import CATEGORIES
 from veille_ia.models import Article
 
 MODELS = [("m", 10)]
+CATEGORY = CATEGORIES["ia"]
 
 
 def articles(n):
@@ -24,7 +26,7 @@ def fake_llm(monkeypatch, content):
 
 def test_same_event_gives_one_topic_with_all_sources(monkeypatch):
     fake_llm(monkeypatch, '{"topics": [{"title": "IPO", "ids": [0, 1]}], "off_topic": []}')
-    topics = cluster.cluster(articles(2), MODELS)
+    topics = cluster.cluster(articles(2), MODELS, CATEGORY)
     assert len(topics) == 1
     assert topics[0].title == "IPO"
     assert [a.url for a in topics[0].articles] == ["http://0", "http://1"]
@@ -32,13 +34,23 @@ def test_same_event_gives_one_topic_with_all_sources(monkeypatch):
 
 def test_off_topic_is_dropped(monkeypatch):
     fake_llm(monkeypatch, '{"topics": [{"title": "A", "ids": [0]}], "off_topic": [1]}')
-    topics = cluster.cluster(articles(2), MODELS)
+    topics = cluster.cluster(articles(2), MODELS, CATEGORY)
     assert [t.title for t in topics] == ["A"]
+
+
+def test_articles_from_category_sites_are_never_dropped_as_off_topic(monkeypatch):
+    fake_llm(monkeypatch, '{"topics": [], "off_topic": [0, 1]}')
+    items = [
+        Article("Blog", "http://blog", "OpenAI", 1, text="x"),
+        Article("Forum", "http://forum", "Hacker News", 1, text="y"),
+    ]
+    topics = cluster.cluster(items, MODELS, CATEGORY)
+    assert [t.title for t in topics] == ["Blog"]
 
 
 def test_unlisted_article_becomes_its_own_topic(monkeypatch):
     fake_llm(monkeypatch, '{"topics": [{"title": "A", "ids": [0]}], "off_topic": []}')
-    topics = cluster.cluster(articles(2), MODELS)
+    topics = cluster.cluster(articles(2), MODELS, CATEGORY)
     assert [t.title for t in topics] == ["A", "T1"]
 
 
@@ -47,31 +59,32 @@ def test_unknown_and_duplicate_ids_are_ignored(monkeypatch):
         monkeypatch,
         '{"topics": [{"title": "A", "ids": [0, 9, "x"]}, {"title": "B", "ids": [0]}], "off_topic": []}',
     )
-    topics = cluster.cluster(articles(1), MODELS)
+    topics = cluster.cluster(articles(1), MODELS, CATEGORY)
     assert [t.title for t in topics] == ["A"]
     assert len(topics[0].articles) == 1
 
 
 def test_json_in_code_fence_is_accepted(monkeypatch):
     fake_llm(monkeypatch, '```json\n{"topics": [{"title": "A", "ids": [0]}]}\n```')
-    assert len(cluster.cluster(articles(1), MODELS)) == 1
+    assert len(cluster.cluster(articles(1), MODELS, CATEGORY)) == 1
 
 
 def test_invalid_json_raises(monkeypatch):
     fake_llm(monkeypatch, "not json")
     with pytest.raises(llm.LLMError):
-        cluster.cluster(articles(1), MODELS)
+        cluster.cluster(articles(1), MODELS, CATEGORY)
 
 
 def test_prompt_numbers_articles_and_models_are_passed(monkeypatch):
     seen = fake_llm(monkeypatch, '{"topics": []}')
-    cluster.cluster(articles(2), MODELS)
+    cluster.cluster(articles(2), MODELS, CATEGORY)
     assert "[0] T0 (S) text 0" in seen["prompt"]
     assert "[1] T1 (S) text 1" in seen["prompt"]
     assert seen["models"] == MODELS
+    assert CATEGORY.label in seen["prompt"]
 
 
 def test_no_articles_makes_no_llm_call(monkeypatch):
     seen = fake_llm(monkeypatch, "")
-    assert cluster.cluster([], MODELS) == []
+    assert cluster.cluster([], MODELS, CATEGORY) == []
     assert "prompt" not in seen

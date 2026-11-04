@@ -2,24 +2,21 @@ import json
 import re
 
 from veille_ia import llm
-from veille_ia.collectors import blogs
 from veille_ia.fulltext import fetch_text
 
-TOPIC_COUNT = 6
 MAX_CANDIDATES = 10
 ARTICLES_PER_TOPIC = 3
 SNIPPET_CHARS = 300
 TEXT_CHARS = 4000
-OFFICIAL_SOURCES = set(blogs.FEEDS)
 
 SYSTEM = (
-    "Tu es un journaliste spécialisé en intelligence artificielle. "
+    "Tu es un journaliste spécialisé dans le domaine « {label} ». "
     "Tu réponds uniquement par un objet JSON, sans texte autour."
 )
 
-SELECT_PROMPT = """Tu prépares le bulletin quotidien de veille sur l'intelligence artificielle.
+SELECT_PROMPT = """Tu prépares le bulletin quotidien de veille sur le domaine « {label} ».
 
-Voici {count} sujets candidats. Choisis exactement {topic_count} sujets, les plus importants pour l'actualité de l'IA, et classe-les du plus important au moins important.
+Voici {count} sujets candidats. Choisis exactement {topic_count} sujets, les plus importants pour l'actualité de ce domaine, et classe-les du plus important au moins important.
 - Un sujet repris par plusieurs sources compte plus.
 - Évite les discussions, questions personnelles et offres d'emploi.
 - Si plusieurs candidats traitent de la même affaire, fusionne-les : mets tous leurs numéros dans le même "ids".
@@ -30,7 +27,7 @@ Réponds avec ce JSON :
 Sujets candidats :
 {topics}"""
 
-WRITE_PROMPT = """Tu rédiges le bulletin quotidien de veille sur l'intelligence artificielle. Il sera lu à voix haute : environ 5 minutes, soit 1000 mots au total.
+WRITE_PROMPT = """Tu rédiges le bulletin quotidien de veille sur le domaine « {label} ». Il sera lu à voix haute.
 
 Voici {count} sujets déjà choisis et classés, avec le texte de leurs articles. Pour chaque sujet, écris un texte en français, en prose, de 160 à 180 mots.
 Règles :
@@ -49,18 +46,19 @@ def is_discussion(topic):
     return all("[D]" in a.title for a in topic.articles)
 
 
-def rank_key(topic):
+def rank_key(topic, official_sources):
     return (
         not is_discussion(topic),
         len({a.source for a in topic.articles}),
-        any(a.source in OFFICIAL_SOURCES for a in topic.articles),
+        any(a.source in official_sources for a in topic.articles),
         sum(a.score for a in topic.articles),
         len(topic.articles),
     )
 
 
-def select_candidates(topics):
-    return sorted(topics, key=rank_key, reverse=True)[:MAX_CANDIDATES]
+def select_candidates(topics, category):
+    official = set(category.blog_feeds)
+    return sorted(topics, key=lambda t: rank_key(t, official), reverse=True)[:MAX_CANDIDATES]
 
 
 def describe(index, title, articles, chars):
@@ -70,16 +68,19 @@ def describe(index, title, articles, chars):
     return "\n".join(lines)
 
 
-def build_select_prompt(candidates):
+def build_select_prompt(candidates, category):
     blocks = [describe(i, t.title, t.articles, SNIPPET_CHARS) for i, t in enumerate(candidates)]
     return SELECT_PROMPT.format(
-        count=len(candidates), topic_count=TOPIC_COUNT, topics="\n\n".join(blocks)
+        label=category.label,
+        count=len(candidates),
+        topic_count=category.topic_count,
+        topics="\n\n".join(blocks),
     )
 
 
-def build_write_prompt(groups):
+def build_write_prompt(groups, category):
     blocks = [describe(i, articles[0].title, articles, TEXT_CHARS) for i, articles in enumerate(groups)]
-    return WRITE_PROMPT.format(count=len(groups), topics="\n\n".join(blocks))
+    return WRITE_PROMPT.format(label=category.label, count=len(groups), topics="\n\n".join(blocks))
 
 
 def parse_topics(content):
@@ -96,8 +97,14 @@ def clean_spoken(text):
     return " ".join(text.split())
 
 
-def choose(candidates, models):
-    items = parse_topics(llm.complete(build_select_prompt(candidates), models, system=SYSTEM))
+def choose(candidates, models, category):
+    items = parse_topics(
+        llm.complete(
+            build_select_prompt(candidates, category),
+            models,
+            system=SYSTEM.format(label=category.label),
+        )
+    )
     chosen = []
     used = set()
     for item in items:
@@ -110,10 +117,10 @@ def choose(candidates, models):
         if indexes:
             used.update(indexes)
             chosen.append(indexes)
-        if len(chosen) == TOPIC_COUNT:
+        if len(chosen) == category.topic_count:
             return chosen
     for index in range(len(candidates)):
-        if len(chosen) == TOPIC_COUNT:
+        if len(chosen) == category.topic_count:
             break
         if index not in used:
             chosen.append([index])
@@ -129,8 +136,14 @@ def fetch_full_texts(articles):
             article.text = text
 
 
-def write(groups, models):
-    items = parse_topics(llm.complete(build_write_prompt(groups), models, system=SYSTEM))
+def write(groups, models, category):
+    items = parse_topics(
+        llm.complete(
+            build_write_prompt(groups, category),
+            models,
+            system=SYSTEM.format(label=category.label),
+        )
+    )
     written = {}
     for item in items:
         index = item.get("id") if isinstance(item, dict) else None
@@ -157,12 +170,12 @@ def write(groups, models):
     return result
 
 
-def summarize(candidates, select_models, write_models):
+def summarize(candidates, category, select_models, write_models):
     if not candidates:
         return []
     groups = [
         [a for index in indexes for a in candidates[index].articles]
-        for indexes in choose(candidates, select_models)
+        for indexes in choose(candidates, select_models, category)
     ]
     fetch_full_texts([a for articles in groups for a in articles[:ARTICLES_PER_TOPIC]])
-    return write(groups, write_models)
+    return write(groups, write_models, category)

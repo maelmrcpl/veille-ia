@@ -6,16 +6,6 @@ from veille_ia.fulltext import fetch_text
 from veille_ia.models import Article
 
 SEARCH_URL = "https://hn.algolia.com/api/v1/search_by_date"
-KEYWORDS = [
-    "AI",
-    "LLM",
-    "GPT",
-    "OpenAI",
-    "Anthropic",
-    "Claude",
-    "Gemini",
-    "machine learning",
-]
 MIN_POINTS = 20
 WINDOW_SECONDS = 24 * 3600
 TIMEOUT = 30
@@ -36,10 +26,10 @@ def search_stories(keyword, now):
     return response.json()["hits"]
 
 
-def collect(now=None):
+def collect(keywords, now=None):
     now = now if now is not None else int(time.time())
     articles = {}
-    for keyword in KEYWORDS:
+    for keyword in keywords:
         for hit in search_stories(keyword, now):
             story_id = hit["objectID"]
             if story_id in articles:
