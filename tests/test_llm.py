@@ -129,3 +129,47 @@ def test_rate_limiter_sleeps_between_calls(monkeypatch):
     llm.complete("x", [("m1", 3)])
     assert len(sleeps) == 1
     assert 0 < sleeps[0] <= 20
+
+
+def test_all_models_overloaded_then_retry_after_wait_succeeds(monkeypatch):
+    sleeps = []
+    monkeypatch.setattr(llm, "OVERLOAD_WAITS", (7, 9))
+    monkeypatch.setattr(llm.time, "sleep", sleeps.append)
+    answers = [FakeResponse(status_code=503), FakeResponse(status_code=503), FakeResponse(content="late")]
+    monkeypatch.setattr(llm.requests, "post", lambda *a, **k: answers.pop(0))
+    assert llm.complete("x", [("m1", 6000), ("m2", 6000)]) == "late"
+    assert [s for s in sleeps if s in (7, 9)] == [7]
+
+
+def test_overload_gives_up_after_all_waits(monkeypatch):
+    calls = []
+    monkeypatch.setattr(llm, "OVERLOAD_WAITS", (7, 9))
+    monkeypatch.setattr(
+        llm.requests, "post", lambda *a, **k: calls.append(1) or FakeResponse(status_code=503, text="busy")
+    )
+    with pytest.raises(llm.LLMError, match="All models exhausted"):
+        llm.complete("x", [("m1", 6000), ("m2", 6000)])
+    assert len(calls) == 6
+
+
+def test_quota_exhaustion_is_not_retried(monkeypatch):
+    calls = []
+    monkeypatch.setattr(
+        llm.requests, "post", lambda *a, **k: calls.append(1) or FakeResponse(status_code=429, text="quota")
+    )
+    with pytest.raises(llm.LLMError):
+        llm.complete("x", [("m1", 6000), ("m2", 6000)])
+    assert len(calls) == 2
+
+
+def test_used_model_and_unavailable_models_are_logged(monkeypatch, capsys):
+    def fake_post(url, headers, json, timeout):
+        if json["model"] == "m1":
+            return FakeResponse(status_code=503, text="busy")
+        return FakeResponse(content="ok")
+
+    monkeypatch.setattr(llm.requests, "post", fake_post)
+    llm.complete("x", [("m1", 6000), ("m2", 6000)])
+    out = capsys.readouterr().out
+    assert "LLM : m1 indisponible (HTTP 503)" in out
+    assert "LLM : m2" in out
