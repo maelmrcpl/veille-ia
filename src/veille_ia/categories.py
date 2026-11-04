@@ -99,4 +99,31 @@ CATEGORIES = {
             "Reddit r/kubernetes": "https://www.reddit.com/r/kubernetes/.rss",
         },
     ),
+    "reseau": Category(
+        id="reseau",
+        label="réseaux et télécoms",
+        topic_count=2,
+        hn_keywords=[
+            "BGP",
+            "IPv6",
+            "5G",
+            "Wi-Fi",
+            "fiber",
+            "VPN",
+            "firewall",
+            "Starlink",
+            "internet outage",
+        ],
+        blog_feeds={
+            "The Register Networks": "https://www.theregister.com/networks/headlines.atom",
+            "Light Reading": "https://www.lightreading.com/rss.xml",
+            "Packet Pushers": "https://packetpushers.net/feed/",
+            "Network World": "https://www.networkworld.com/feed/",
+            "Cisco Blogs": "https://blogs.cisco.com/feed",
+            "APNIC": "https://blog.apnic.net/feed/",
+        },
+        reddit_feeds={
+            "Reddit r/networking": "https://www.reddit.com/r/networking/.rss",
+        },
+    ),
 }
