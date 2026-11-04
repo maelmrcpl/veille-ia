@@ -38,6 +38,16 @@ def test_off_topic_is_dropped(monkeypatch):
     assert [t.title for t in topics] == ["A"]
 
 
+def test_articles_from_category_sites_are_never_dropped_as_off_topic(monkeypatch):
+    fake_llm(monkeypatch, '{"topics": [], "off_topic": [0, 1]}')
+    items = [
+        Article("Blog", "http://blog", "OpenAI", 1, text="x"),
+        Article("Forum", "http://forum", "Hacker News", 1, text="y"),
+    ]
+    topics = cluster.cluster(items, MODELS, CATEGORY)
+    assert [t.title for t in topics] == ["Blog"]
+
+
 def test_unlisted_article_becomes_its_own_topic(monkeypatch):
     fake_llm(monkeypatch, '{"topics": [{"title": "A", "ids": [0]}], "off_topic": []}')
     topics = cluster.cluster(articles(2), MODELS, CATEGORY)

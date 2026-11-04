@@ -7,7 +7,7 @@ verifie: 2026-11-04
 
 ## Projet
 - Objectif final (déclaré par l'utilisateur) : une web GUI regroupant les news du jour sur plusieurs sujets (cyber, réseau, IA…), puis un audio qui les lit par catégorie.
-- Étape actuelle : un agent Python de veille IA, tourne chaque jour vers 8h via la tâche planifiée `VeilleIA` (voir `memoire/resume.md`).
+- Étape actuelle : un agent Python de veille sur 4 catégories (IA, cybersécurité, cloud/DevOps/infra, réseaux ; voir `memoire/categories.md`), qui tourne chaque jour vers 8h via la tâche planifiée `VeilleIA` (voir `memoire/resume.md`).
 - Code présent : collecte (Hacker News, blogs, Reddit), client LLM, dédoublonnage, regroupement, résumé, JSON du jour, point d'entrée `src/veille_ia/main.py` et planification Windows.
 
 ## Structure du dépôt

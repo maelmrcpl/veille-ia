@@ -1,5 +1,7 @@
-import json
+﻿import json
 from dataclasses import replace
+
+import pytest
 
 from veille_ia import dedup, main
 from veille_ia.categories import CATEGORIES
@@ -80,3 +82,21 @@ def test_missing_models_variable_raises(monkeypatch, tmp_path):
         assert "LLM_MODELS_SUMMARY" in str(error)
     else:
         raise AssertionError("LLMError expected")
+
+
+def test_main_continues_after_a_failing_category_and_exits_with_error(monkeypatch, capsys):
+    monkeypatch.setattr(main, "load_dotenv", lambda: None)
+    ran = []
+
+    def fake_run(category):
+        ran.append(category.id)
+        if category.id == "ia":
+            raise main.llm.LLMError("quota")
+        return None
+
+    monkeypatch.setattr(main, "run", fake_run)
+    with pytest.raises(SystemExit) as exit_info:
+        main.main()
+    assert exit_info.value.code == 1
+    assert ran == list(CATEGORIES)
+    assert "ia : échec : quota" in capsys.readouterr().out

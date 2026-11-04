@@ -1,5 +1,6 @@
 import json
 import os
+import sys
 import time
 
 from dotenv import load_dotenv
@@ -58,8 +59,14 @@ def run(category, now=None, report_dir=None, seen_path=dedup.SEEN_PATH):
 
 def main(ids=None):
     load_dotenv()
+    failed = []
     for category in [CATEGORIES[i] for i in ids] if ids else CATEGORIES.values():
-        path = run(category)
+        try:
+            path = run(category)
+        except Exception as error:
+            print(f"{category.id} : échec : {error}")
+            failed.append(category.id)
+            continue
         if path is None:
             print(f"{category.id} : aucun nouvel article, aucun fichier écrit.")
             continue
@@ -67,3 +74,5 @@ def main(ids=None):
             topics = json.load(file)["topics"]
         words = sum(len(t["text"].split()) for t in topics)
         print(f"{path} : {len(topics)} sujets, {words} mots")
+    if failed:
+        sys.exit(1)
