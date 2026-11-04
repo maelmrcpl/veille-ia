@@ -1,3 +1,4 @@
+from veille_ia.categories import CATEGORIES
 from veille_ia.collectors import reddit, rss
 
 NOW = 1_700_000_000
@@ -25,7 +26,7 @@ def test_collect_reads_atom_and_skips_blocked_subreddit(monkeypatch):
         return FakeResponse(429 if "LocalLLaMA" in url else 200)
 
     monkeypatch.setattr(rss.requests, "get", fake_get)
-    articles = reddit.collect(now=NOW)
+    articles = reddit.collect(CATEGORIES["ia"].reddit_feeds, now=NOW)
     assert len(articles) == 1
     assert articles[0].source == "Reddit r/MachineLearning"
     assert articles[0].url == "http://post"

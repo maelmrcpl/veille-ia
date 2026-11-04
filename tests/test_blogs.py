@@ -58,8 +58,7 @@ def test_collect_feed_sends_user_agent(monkeypatch):
 
 
 def test_blogs_collect_gathers_all_feeds(monkeypatch):
-    monkeypatch.setattr(blogs, "FEEDS", {"A": "http://a", "B": "http://b"})
     xml = feed_xml(("T", "http://t", RECENT, "s"))
     monkeypatch.setattr(rss.requests, "get", lambda *a, **k: FakeResponse(xml))
-    articles = blogs.collect(now=NOW)
+    articles = blogs.collect({"A": "http://a", "B": "http://b"}, now=NOW)
     assert [a.source for a in articles] == ["A", "B"]
