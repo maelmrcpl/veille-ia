@@ -37,4 +37,33 @@ CATEGORIES = {
             "Reddit r/LocalLLaMA": "https://www.reddit.com/r/LocalLLaMA/.rss",
         },
     ),
+    "cyber": Category(
+        id="cyber",
+        label="cybersécurité",
+        topic_count=4,
+        hn_keywords=[
+            "security",
+            "cybersecurity",
+            "vulnerability",
+            "ransomware",
+            "breach",
+            "malware",
+            "exploit",
+            "zero-day",
+            "phishing",
+            "hackers",
+        ],
+        blog_feeds={
+            "BleepingComputer": "https://www.bleepingcomputer.com/feed/",
+            "The Hacker News": "https://feeds.feedburner.com/TheHackersNews",
+            "SecurityWeek": "https://feeds.feedburner.com/securityweek",
+            "Dark Reading": "https://www.darkreading.com/rss.xml",
+            "Krebs on Security": "https://krebsonsecurity.com/feed/",
+            "Schneier on Security": "https://www.schneier.com/feed/atom/",
+        },
+        reddit_feeds={
+            "Reddit r/netsec": "https://www.reddit.com/r/netsec/.rss",
+            "Reddit r/cybersecurity": "https://www.reddit.com/r/cybersecurity/.rss",
+        },
+    ),
 }
