@@ -34,6 +34,6 @@ La mémoire du projet (architecture, choix, commandes) est dans `memoire/`.
 
 ## Workflow
 
-Voici le workflow suivant, avant l'implémentation de l'audio
+Voici le workflow suivie par l'app, avant l'implémentation de l'audio
 
 <img width="1266" height="1591" alt="image" src="https://github.com/user-attachments/assets/ea5e14bb-22dd-4335-b210-5025a155f54a" />
