@@ -6,11 +6,12 @@ verifie: 2026-11-03
 # Client LLM
 
 ## Fonctionnement (`src/veille_ia/llm.py`)
-- `complete(prompt, models, system=None)` envoie une requête POST chat completions (format OpenAI) et renvoie le texte de `choices[0].message.content`. `models` est une liste de `(nom, rpm)`.
+- `complete(prompt, models, system=None)` envoie une requête POST chat completions (format OpenAI, `temperature` à 0) et renvoie le texte de `choices[0].message.content`. `models` est une liste de `(nom, rpm)`.
 - `parse_models("a:15,b:5")` convertit la valeur d'une variable en liste de `(nom, rpm)` ; `LLMError` si une entrée n'a pas de `:rpm` entier positif.
 - Limiteur par modèle : attente d'au moins `60 / rpm` secondes entre deux appels du même modèle (état dans `_last_call`).
-- Repli : sur HTTP 429, le modèle est marqué épuisé (`_exhausted`, pour la durée du processus) et le suivant est essayé. Tout autre code d'erreur lève `LLMError` immédiatement. Si tous les modèles sont épuisés : `LLMError("All models exhausted. …")` avec le texte des réponses 429.
-- Délai d'attente HTTP : 60 secondes. Le fichier `.env` est chargé par `python-dotenv` à chaque appel de `complete`.
+- Repli : sur HTTP 429 ou 404 (quota épuisé, modèle retiré), le modèle est marqué épuisé (`_exhausted`, pour la durée du processus) et le suivant est essayé. Sur 503 (surcharge temporaire), le suivant est essayé sans marquer le modèle. Tout autre code d'erreur lève `LLMError` immédiatement. Si tous les modèles sont écartés : `LLMError("All models exhausted. …")` avec le texte des réponses. Un délai dépassé (`requests.ReadTimeout`) n'est pas rattrapé : il remonte tel quel.
+- Délai d'attente HTTP : 600 secondes (60 puis 180 étaient trop courts pour le résumé de 1 000 mots). Le fichier `.env` est chargé par `python-dotenv` à chaque appel de `complete`.
+- Constat du 2026-11-03 : `gemini-2.5-flash` répondait 404 (« plus disponible pour les nouveaux utilisateurs ») et `gemini-3.8-flash` répondait 503 plusieurs fois ; deux appels de résumé ont dépassé 180 s.
 
 ## Variables d'environnement (`.env.example`, valeurs réelles dans `.env`)
 | Variable | Rôle |
@@ -32,4 +33,4 @@ verifie: 2026-11-03
 | `gemini-3.6-flash` | 5 | 20 |
 | `gemini-3.8-flash` | 3 | 20 |
 
-Répartition prévue (inféré du plan) : modèles Lite pour le regroupement, Flash pour le résumé. Si un modèle reste en 429 plusieurs jours (quota mensuel éventuel), c'est à confirmer par l'usage.
+Répartition (`.env.example`, alignée sur le `.env` de l'utilisateur au 2026-11-04) : `LLM_MODELS_CLUSTER` = 2 modèles Lite (regroupement et choix des sujets) ; `LLM_MODELS_SUMMARY` = `gemini-3.8-flash`, `gemini-3.6-flash`, puis `gemini-3.5-flash-lite` en dernier repli (rédaction ; Flash souvent en 503). `gemini-2.5-flash` est retiré (404). Si un modèle reste en 429 plusieurs jours (quota mensuel éventuel), c'est à confirmer par l'usage.

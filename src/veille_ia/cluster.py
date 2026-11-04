@@ -11,8 +11,8 @@ SYSTEM = (
     "Tu réponds uniquement par un objet JSON, sans texte autour."
 )
 
-PROMPT = """Voici des articles numérotés. Regroupe uniquement ceux qui parlent du même événement précis (même annonce, même publication, même affaire).
-Ne crée pas de groupe thématique large : un article sans équivalent reste seul dans son propre sujet.
+PROMPT = """Voici des articles numérotés. Regroupe ceux qui traitent de la même affaire d'actualité : même annonce, même publication, même dossier, même si chaque article en donne un angle différent (chiffres, réactions, critiques). Exemple : tous les articles sur le dépôt du dossier d'introduction en bourse d'une même entreprise forment un seul groupe.
+Ne regroupe pas des affaires différentes sous un thème large (« recherche en IA », « entreprises et IA ») : un article sans équivalent reste seul dans son propre sujet. En général la plupart des articles restent seuls et quelques groupes comptent 2 à 8 articles.
 Écarte (off_topic) ceux qui ne concernent pas l'intelligence artificielle, ainsi que les questions personnelles ou discussions sans information.
 
 Réponds avec ce JSON :
