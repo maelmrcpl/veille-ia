@@ -62,6 +62,28 @@ def test_fallback_on_429(monkeypatch):
     assert "m1" in llm._exhausted
 
 
+def test_fallback_on_503_without_marking_model_exhausted(monkeypatch):
+    def fake_post(url, headers, json, timeout):
+        if json["model"] == "m1":
+            return FakeResponse(status_code=503, text="overloaded")
+        return FakeResponse(content="from m2")
+
+    monkeypatch.setattr(llm.requests, "post", fake_post)
+    assert llm.complete("x", [("m1", 5), ("m2", 5)]) == "from m2"
+    assert "m1" not in llm._exhausted
+
+
+def test_fallback_on_404_marks_model_exhausted(monkeypatch):
+    def fake_post(url, headers, json, timeout):
+        if json["model"] == "m1":
+            return FakeResponse(status_code=404, text="gone")
+        return FakeResponse(content="from m2")
+
+    monkeypatch.setattr(llm.requests, "post", fake_post)
+    assert llm.complete("x", [("m1", 5), ("m2", 5)]) == "from m2"
+    assert "m1" in llm._exhausted
+
+
 def test_exhausted_model_is_not_retried(monkeypatch):
     seen = []
 

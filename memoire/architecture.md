@@ -8,7 +8,7 @@ verifie: 2026-11-03
 ## Projet
 - Objectif final (déclaré par l'utilisateur) : une web GUI regroupant les news du jour sur plusieurs sujets (cyber, réseau, IA…), puis un audio qui les lit par catégorie.
 - Étape actuelle : un agent Python de veille IA, prévu pour tourner chaque jour vers 8h (Planificateur de tâches Windows, pas encore en place). Le plan de développement est dans `memoire/PLAN.md`.
-- Code présent : collecte Hacker News avec lecture complète des pages et client LLM. Absents : autres sources, regroupement, résumé, JSON du jour, point d'entrée unique, planification (voir `memoire/PLAN.md`).
+- Code présent : collecte (Hacker News, blogs, Reddit), client LLM, dédoublonnage, regroupement, résumé, JSON du jour et point d'entrée `src/veille_ia/main.py`. Absente : planification (voir `memoire/PLAN.md`).
 
 ## Structure du dépôt
 | Dossier ou fichier | Rôle |
@@ -30,7 +30,7 @@ verifie: 2026-11-03
 | `.harness-base` | Marqueur de la version de harness-base installée (source, version, date). Écrit par le script d'installation de la base, lu par son script de mise à jour des projets. Ne pas modifier à la main. |
 
 ## Configuration
-- `.gitignore` : fichiers exclus du dépôt (`.env`, `.venv/`, `__pycache__/`, `.pytest_cache/`, `node_modules/`).
+- `.gitignore` : fichiers exclus du dépôt (`.env`, `.venv/`, `__pycache__/`, `.pytest_cache/`, `node_modules/`, `data/`).
 - `memoire/_ignore.txt` : fichiers suivis par Git exemptés de la vérification « couvert par la mémoire ».
 - `scripts/routeur.ps1` : seuils de budget de contexte en tête de script (`$maxChargeEnPermanence`, `$maxFichierMemoire`). Détection de péremption : champ `verifie: AAAA-MM-JJ` de l'en-tête d'un fichier de mémoire.
 - Variables d'environnement du client LLM : voir `memoire/llm.md`.

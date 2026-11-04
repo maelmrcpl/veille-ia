@@ -4,7 +4,7 @@ import time
 import requests
 from dotenv import load_dotenv
 
-DEFAULT_TIMEOUT = 60
+DEFAULT_TIMEOUT = 600
 
 _last_call = {}
 _exhausted = set()
@@ -61,11 +61,12 @@ def complete(prompt, models, system=None):
         response = requests.post(
             url,
             headers={"Authorization": f"Bearer {key}"},
-            json={"model": model, "messages": messages},
+            json={"model": model, "messages": messages, "temperature": 0},
             timeout=DEFAULT_TIMEOUT,
         )
-        if response.status_code == 429:
-            _exhausted.add(model)
+        if response.status_code in (404, 429, 503):
+            if response.status_code != 503:
+                _exhausted.add(model)
             errors.append(f"{model}: {response.text}")
             continue
         if not response.ok:
