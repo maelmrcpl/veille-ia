@@ -5,6 +5,7 @@ import requests
 from dotenv import load_dotenv
 
 DEFAULT_TIMEOUT = 600
+OVERLOAD_WAITS = (30, 60)
 
 _last_call = {}
 _exhausted = set()
@@ -54,22 +55,33 @@ def complete(prompt, models, system=None):
     messages.append({"role": "user", "content": prompt})
 
     errors = []
-    for model, rpm in models:
-        if model in _exhausted:
-            continue
-        _wait_for_slot(model, rpm)
-        response = requests.post(
-            url,
-            headers={"Authorization": f"Bearer {key}"},
-            json={"model": model, "messages": messages, "temperature": 0},
-            timeout=DEFAULT_TIMEOUT,
-        )
-        if response.status_code in (404, 429, 503):
-            if response.status_code != 503:
-                _exhausted.add(model)
-            errors.append(f"{model}: {response.text}")
-            continue
-        if not response.ok:
-            raise LLMError(f"{model}: HTTP {response.status_code}: {response.text}")
-        return response.json()["choices"][0]["message"]["content"]
+    for wait in (0, *OVERLOAD_WAITS):
+        if wait:
+            print(f"LLM : tous les modèles surchargés, nouvelle tentative dans {wait} s")
+            time.sleep(wait)
+        overloaded = False
+        for model, rpm in models:
+            if model in _exhausted:
+                continue
+            _wait_for_slot(model, rpm)
+            response = requests.post(
+                url,
+                headers={"Authorization": f"Bearer {key}"},
+                json={"model": model, "messages": messages, "temperature": 0},
+                timeout=DEFAULT_TIMEOUT,
+            )
+            if response.status_code in (404, 429, 503):
+                if response.status_code == 503:
+                    overloaded = True
+                else:
+                    _exhausted.add(model)
+                print(f"LLM : {model} indisponible (HTTP {response.status_code})")
+                errors.append(f"{model}: {response.text}")
+                continue
+            if not response.ok:
+                raise LLMError(f"{model}: HTTP {response.status_code}: {response.text}")
+            print(f"LLM : {model}")
+            return response.json()["choices"][0]["message"]["content"]
+        if not overloaded:
+            break
     raise LLMError("All models exhausted. " + " | ".join(errors))
