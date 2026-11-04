@@ -5,7 +5,7 @@ import time
 
 from dotenv import load_dotenv
 
-from veille_ia import cluster, dedup, llm, summary
+from veille_ia import audio, cluster, dedup, llm, summary, tts
 from veille_ia.categories import CATEGORIES
 from veille_ia.collectors import blogs, hn, reddit
 
@@ -71,8 +71,21 @@ def main(ids=None):
             print(f"{category.id} : aucun nouvel article, aucun fichier écrit.")
             continue
         with open(path, encoding="utf-8") as file:
-            topics = json.load(file)["topics"]
-        words = sum(len(t["text"].split()) for t in topics)
-        print(f"{path} : {len(topics)} sujets, {words} mots")
+            report = json.load(file)
+        words = sum(len(t["text"].split()) for t in report["topics"])
+        print(f"{path} : {len(report['topics'])} sujets, {words} mots")
+        try:
+            models, voices = tts.list_from_env("TTS_MODELS"), tts.list_from_env("VOICES")
+            print(f"{audio.category_audio(report, category, models, voices)} : audio écrit")
+        except Exception as error:
+            print(f"{category.id} : audio : échec : {error}")
+    try:
+        models, voices = tts.list_from_env("TTS_MODELS"), tts.list_from_env("VOICES")
+        date = time.strftime("%Y-%m-%d")
+        global_path = audio.global_audio(date, models, voices)
+        if global_path:
+            print(f"{global_path} : audio global écrit")
+    except Exception as error:
+        print(f"audio global : échec : {error}")
     if failed:
         sys.exit(1)

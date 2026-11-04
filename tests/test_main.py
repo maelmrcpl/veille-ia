@@ -86,6 +86,7 @@ def test_missing_models_variable_raises(monkeypatch, tmp_path):
 
 def test_main_continues_after_a_failing_category_and_exits_with_error(monkeypatch, capsys):
     monkeypatch.setattr(main, "load_dotenv", lambda: None)
+    monkeypatch.delenv("TTS_MODELS", raising=False)
     ran = []
 
     def fake_run(category):
@@ -100,3 +101,28 @@ def test_main_continues_after_a_failing_category_and_exits_with_error(monkeypatc
     assert exit_info.value.code == 1
     assert ran == list(CATEGORIES)
     assert "ia : échec : quota" in capsys.readouterr().out
+
+
+def test_main_writes_category_and_global_audio_and_survives_audio_failure(
+    monkeypatch, tmp_path, capsys
+):
+    monkeypatch.setattr(main, "load_dotenv", lambda: None)
+    monkeypatch.setenv("TTS_MODELS", "m")
+    monkeypatch.setenv("VOICES", "A,B")
+    report = {"date": "2026-11-04", "category": "ia", "topics": [{"rank": 1, "title": "T", "text": "x"}]}
+    report_path = tmp_path / "r.json"
+    report_path.write_text(json.dumps(report), encoding="utf-8")
+    monkeypatch.setattr(main, "run", lambda category: str(report_path))
+
+    def fake_category_audio(report, category, models, voices):
+        if category.id == "cyber":
+            raise main.llm.LLMError("quota")
+        return f"{category.id}.wav"
+
+    monkeypatch.setattr(main.audio, "category_audio", fake_category_audio)
+    monkeypatch.setattr(main.audio, "global_audio", lambda date, models, voices: "global.wav")
+    main.main()
+    out = capsys.readouterr().out
+    assert "ia.wav : audio écrit" in out
+    assert "cyber : audio : échec : quota" in out
+    assert "global.wav : audio global écrit" in out

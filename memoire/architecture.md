@@ -15,7 +15,7 @@ verifie: 2026-11-04
 |---|---|
 | `src/veille_ia/` | Package Python de l'agent. Détails dans `memoire/collecte.md` et `memoire/llm.md`. |
 | `tests/` | Tests `pytest`, sans appel réseau. |
-| `scripts/` | `routeur.ps1` (mémoire), `run_agent.py` (lancement de l'agent), `run_daily.ps1` et `register_task.ps1` (planification), `try_llm.py`, `try_hn.py`, `try_all.py` et `try_cluster.py` (essais réels lancés à la main). |
+| `scripts/` | `routeur.ps1` (mémoire), `run_agent.py` (lancement de l'agent), `run_daily.ps1` et `register_task.ps1` (planification), `try_llm.py`, `try_hn.py`, `try_all.py` et `try_cluster.py` (essais réels lancés à la main). L'audio est décrit dans `memoire/audio.md` (`try_tts.py`). |
 | `memoire/` | Mémoire du projet. |
 | `README.md` | Installation et lancement des tests. |
 

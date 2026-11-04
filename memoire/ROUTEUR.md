@@ -10,6 +10,7 @@ Lis un fichier quand la tâche correspond à sa colonne « Quand le lire ». Plu
 | Fichier | Quand le lire |
 |---|---|
 | `memoire/architecture.md` | Tu découvres le projet ; tu modifies sa structure ou sa configuration (opencode.json, .gitignore, CI) ; tu ajoutes ou modifies un skill, un agent ou une commande ; tu ajoutes un fichier de mémoire |
+| `memoire/audio.md` | Tu modifies la génération audio (TTS), les voix, les fichiers WAV ou l'audio global du jour |
 | `memoire/categories.md` | Tu ajoutes ou modifies une catégorie de veille (IA, cyber, réseau, cloud), ses sources, son libellé ou son nombre de sujets |
 | `memoire/collecte.md` | Tu ajoutes ou modifies un collecteur de news, le type Article, la recherche Hacker News ou la lecture complète des pages |
 | `memoire/llm.md` | Tu modifies ou appelles le client LLM ; tu changes les modèles, leurs quotas ou les variables d'environnement LLM |
